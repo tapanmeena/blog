@@ -1,10 +1,29 @@
 ---
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+
+type Post = CollectionEntry<"blog">;
+
 console.log("This runs in your terminal, not the browser!");
+const allPosts = await getCollection("blog");
+console.log(allPosts[0]?.slug);
 ---
 
 <html>
   <body>
     <h1>Hello, World!</h1>
+    Blog post links:
+    <ul>
+      {
+        allPosts
+          .filter((post) => !post.data.draft)
+          .map((post) => (
+            <li>
+              <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+            </li>
+          ))
+      }
+    </ul>
   </body>
 </html>
 <style>
