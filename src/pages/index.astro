@@ -1,16 +1,14 @@
 ---
 import { getCollection } from "astro:content";
-import type { CollectionEntry } from "astro:content";
-
-type Post = CollectionEntry<"blog">;
+import Navigation from "@components/Navigation.astro";
 
 console.log("This runs in your terminal, not the browser!");
 const allPosts = await getCollection("blog");
-console.log(allPosts[0]?.slug);
 ---
 
 <html>
   <body>
+    <Navigation />
     <h1>Hello, World!</h1>
     Blog post links:
     <ul>
