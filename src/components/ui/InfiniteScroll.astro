@@ -15,8 +15,45 @@ const { initialCount = 6, loadCount = 6 } = Astro.props;
   </div>
   <div class="infinite-scroll-sentinel" aria-hidden="true"></div>
   <div class="infinite-scroll-loader" aria-live="polite">
-    <div class="loader-spinner"></div>
-    <span>Loading more posts...</span>
+    <!-- Skeleton Cards -->
+    <div class="skeleton-grid">
+      <div class="skeleton-card">
+        <div class="skeleton-image"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-meta"></div>
+          <div class="skeleton-title"></div>
+          <div class="skeleton-desc"></div>
+          <div class="skeleton-footer">
+            <div class="skeleton-avatar"></div>
+            <div class="skeleton-badge"></div>
+          </div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-image"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-meta"></div>
+          <div class="skeleton-title"></div>
+          <div class="skeleton-desc"></div>
+          <div class="skeleton-footer">
+            <div class="skeleton-avatar"></div>
+            <div class="skeleton-badge"></div>
+          </div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-image"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-meta"></div>
+          <div class="skeleton-title"></div>
+          <div class="skeleton-desc"></div>
+          <div class="skeleton-footer">
+            <div class="skeleton-avatar"></div>
+            <div class="skeleton-badge"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="infinite-scroll-end" aria-live="polite">
     <span>You've reached the end!</span>
@@ -49,18 +86,86 @@ const { initialCount = 6, loadCount = 6 } = Astro.props;
     }
 
     .infinite-scroll-loader {
-      @apply hidden items-center justify-center gap-3 py-8;
-      color: var(--color-muted);
+      @apply hidden py-8;
     }
 
     .infinite-scroll-loader.loading {
-      @apply flex;
+      @apply block;
     }
 
-    .loader-spinner {
-      @apply h-5 w-5 animate-spin rounded-full border-2;
-      border-color: var(--color-border);
-      border-top-color: var(--color-accent);
+    /* Skeleton Styles */
+    .skeleton-grid {
+      @apply grid gap-6;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
+    .skeleton-card {
+      @apply overflow-hidden rounded-xl;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+    }
+
+    .skeleton-image {
+      @apply aspect-video w-full;
+      background: linear-gradient(90deg, var(--color-bg) 25%, var(--color-border) 50%, var(--color-bg) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-content {
+      @apply flex flex-col gap-3 p-5;
+    }
+
+    .skeleton-meta {
+      @apply h-4 w-32 rounded;
+      background: linear-gradient(90deg, var(--color-bg) 25%, var(--color-border) 50%, var(--color-bg) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    .skeleton-title {
+      @apply h-6 w-3/4 rounded;
+      background: linear-gradient(90deg, var(--color-bg) 25%, var(--color-border) 50%, var(--color-bg) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      animation-delay: 0.1s;
+    }
+
+    .skeleton-desc {
+      @apply h-4 w-full rounded;
+      background: linear-gradient(90deg, var(--color-bg) 25%, var(--color-border) 50%, var(--color-bg) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      animation-delay: 0.2s;
+    }
+
+    .skeleton-footer {
+      @apply flex items-center justify-between pt-2;
+    }
+
+    .skeleton-avatar {
+      @apply h-7 w-24 rounded-full;
+      background: linear-gradient(90deg, var(--color-bg) 25%, var(--color-border) 50%, var(--color-bg) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      animation-delay: 0.3s;
+    }
+
+    .skeleton-badge {
+      @apply h-6 w-16 rounded-full;
+      background: linear-gradient(90deg, var(--color-bg) 25%, var(--color-border) 50%, var(--color-bg) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      animation-delay: 0.4s;
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
     }
 
     .infinite-scroll-end {

@@ -34,12 +34,7 @@ const tagLabel = posts?.[0]?.data?.tags?.find((t) => normalizeTag(t) === tag) ??
       <ArrowLeft size={16} />
       All Tags
     </a>
-
     <header class="page-header">
-      <div class="tag-badge">
-        <TagIcon size={20} />
-        <span>Tag</span>
-      </div>
       <h1>{tagLabel}</h1>
       <p class="post-count">
         {posts.length}
