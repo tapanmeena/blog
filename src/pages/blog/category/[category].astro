@@ -1,16 +1,19 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import BlogCard from "@components/blog/BlogCard.astro";
+import InfiniteScroll from "@components/ui/InfiniteScroll.astro";
 import { collectUniqueCategory, normalizeCategory, filterPostsByCategory } from "@utils/category";
 import { getCollection } from "astro:content";
-// import { normalizeTag, collectUniqueTags, filterPostsByTag } from "@utils/tags";
+import { Folder, ArrowLeft } from "@lucide/astro";
 
 export async function getStaticPaths() {
   const allPosts = await getCollection("blog");
-  const uniqueCategories = collectUniqueCategory(allPosts);
+  const publishedPosts = allPosts.filter((post) => !post.data.draft);
+  const uniqueCategories = collectUniqueCategory(publishedPosts);
   const uniqueSlugs = [...new Set(uniqueCategories.map((t) => normalizeCategory(t)))];
 
   return uniqueSlugs.map((category) => {
-    const filteredPosts = filterPostsByCategory(allPosts, category);
+    const filteredPosts = filterPostsByCategory(publishedPosts, category).sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
     return {
       params: { category },
       props: { posts: filteredPosts },
@@ -20,39 +23,102 @@ export async function getStaticPaths() {
 
 const { category } = Astro.params;
 const { posts } = Astro.props;
+
+// Get the original category label from the first post
+const categoryLabel = posts?.[0]?.data?.category ?? category;
 ---
 
-<!-- <BaseLayout pageTitle={tag}>
-  {
-    (() => {
-      const label = posts?.[0]?.data?.tags?.find((t) => normalizeTag(t) === tag) ?? tag;
-      return <p>Posts tagged with {label}</p>;
-    })()
-  }
-  <ul>
+<BaseLayout pageTitle={`${categoryLabel} - Category`}>
+  <div class="category-page">
+    <a href="/blog/category" class="back-link">
+      <ArrowLeft size={16} />
+      All Categories
+    </a>
+
+    <header class="page-header">
+      <div class="category-badge">
+        <Folder size={20} />
+        <span>Category</span>
+      </div>
+      <h1>{categoryLabel}</h1>
+      <p class="post-count">
+        {posts.length}
+        {posts.length === 1 ? "post" : "posts"}
+      </p>
+    </header>
+
     {
-      posts.map((post) => (
-        <li>
-          <a href={`/blog/${post.slug}`}>{post.data.title}</a>
-        </li>
-      ))
+      posts.length > 0 ? (
+        <InfiniteScroll initialCount={6} loadCount={6}>
+          {posts.map((post) => (
+            <BlogCard post={post} />
+          ))}
+        </InfiniteScroll>
+      ) : (
+        <div class="empty-state">
+          <p>No posts found in this category.</p>
+          <a href="/blog/category" class="back-button">
+            Browse all categories
+          </a>
+        </div>
+      )
     }
-  </ul>
-</BaseLayout> -->
-<BaseLayout pageTitle={category}>
-  {
-    (() => {
-      const label = posts?.[0]?.data?.category ?? category;
-      return <p>Posts in category {label}</p>;
-    })()
-  }
-  <ul>
-    {
-      posts.map((post) => (
-        <li>
-          <a href={`/blog/${post.slug}`}>{post.data.title}</a>
-        </li>
-      ))
-    }
-  </ul>
+  </div>
 </BaseLayout>
+
+<style>
+  @reference "tailwindcss";
+
+  @layer components {
+    .category-page {
+      @apply mx-auto max-w-6xl px-4;
+    }
+
+    .back-link {
+      @apply mb-6 inline-flex items-center gap-2 text-sm no-underline;
+      color: var(--color-muted);
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: var(--color-accent);
+    }
+
+    .page-header {
+      @apply mb-10 text-center;
+    }
+
+    .category-badge {
+      @apply mx-auto mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium;
+      background-color: var(--color-accent);
+      color: white;
+    }
+
+    .page-header h1 {
+      @apply mb-2 text-4xl font-bold;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+    }
+
+    .post-count {
+      @apply text-lg;
+      color: var(--color-muted);
+    }
+
+    .empty-state {
+      @apply flex flex-col items-center gap-4 py-16 text-center;
+      color: var(--color-muted);
+    }
+
+    .back-button {
+      @apply rounded-lg px-4 py-2 text-sm font-medium no-underline;
+      background-color: var(--color-accent);
+      color: white;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-button:hover {
+      background-color: var(--color-accent-hover);
+    }
+  }
+</style>

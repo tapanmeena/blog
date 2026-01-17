@@ -1,15 +1,19 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
+import BlogCard from "@components/blog/BlogCard.astro";
+import InfiniteScroll from "@components/ui/InfiniteScroll.astro";
 import { getCollection } from "astro:content";
 import { normalizeTag, collectUniqueTags, filterPostsByTag } from "@utils/tags";
+import { Tag as TagIcon, ArrowLeft } from "@lucide/astro";
 
 export async function getStaticPaths() {
   const allPosts = await getCollection("blog");
-  const uniqueTags = collectUniqueTags(allPosts);
+  const publishedPosts = allPosts.filter((post) => !post.data.draft);
+  const uniqueTags = collectUniqueTags(publishedPosts);
   const uniqueSlugs = [...new Set(uniqueTags.map((t) => normalizeTag(t)))];
 
   return uniqueSlugs.map((tag) => {
-    const filteredPosts = filterPostsByTag(allPosts, tag);
+    const filteredPosts = filterPostsByTag(publishedPosts, tag).sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
     return {
       params: { tag },
       props: { posts: filteredPosts },
@@ -19,22 +23,103 @@ export async function getStaticPaths() {
 
 const { tag } = Astro.params;
 const { posts } = Astro.props;
+
+// Get the original tag label from the first post
+const tagLabel = posts?.[0]?.data?.tags?.find((t) => normalizeTag(t) === tag) ?? tag;
 ---
 
-<BaseLayout pageTitle={tag}>
-  {
-    (() => {
-      const label = posts?.[0]?.data?.tags?.find((t) => normalizeTag(t) === tag) ?? tag;
-      return <p>Posts tagged with {label}</p>;
-    })()
-  }
-  <ul>
+<BaseLayout pageTitle={`${tagLabel} - Tag`}>
+  <div class="tag-page">
+    <a href="/blog/tags" class="back-link">
+      <ArrowLeft size={16} />
+      All Tags
+    </a>
+
+    <header class="page-header">
+      <div class="tag-badge">
+        <TagIcon size={20} />
+        <span>Tag</span>
+      </div>
+      <h1>{tagLabel}</h1>
+      <p class="post-count">
+        {posts.length}
+        {posts.length === 1 ? "post" : "posts"}
+      </p>
+    </header>
+
     {
-      posts.map((post) => (
-        <li>
-          <a href={`/blog/${post.slug}`}>{post.data.title}</a>
-        </li>
-      ))
+      posts.length > 0 ? (
+        <InfiniteScroll initialCount={6} loadCount={6}>
+          {posts.map((post) => (
+            <BlogCard post={post} />
+          ))}
+        </InfiniteScroll>
+      ) : (
+        <div class="empty-state">
+          <p>No posts found with this tag.</p>
+          <a href="/blog/tags" class="back-button">
+            Browse all tags
+          </a>
+        </div>
+      )
     }
-  </ul>
+  </div>
 </BaseLayout>
+
+<style>
+  @reference "tailwindcss";
+
+  @layer components {
+    .tag-page {
+      @apply mx-auto max-w-6xl px-4;
+    }
+
+    .back-link {
+      @apply mb-6 inline-flex items-center gap-2 text-sm no-underline;
+      color: var(--color-muted);
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: var(--color-accent);
+    }
+
+    .page-header {
+      @apply mb-10 text-center;
+    }
+
+    .tag-badge {
+      @apply mx-auto mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium;
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+
+    .page-header h1 {
+      @apply mb-2 text-4xl font-bold;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+    }
+
+    .post-count {
+      @apply text-lg;
+      color: var(--color-muted);
+    }
+
+    .empty-state {
+      @apply flex flex-col items-center gap-4 py-16 text-center;
+      color: var(--color-muted);
+    }
+
+    .back-button {
+      @apply rounded-lg px-4 py-2 text-sm font-medium no-underline;
+      background-color: var(--color-accent);
+      color: white;
+      transition: background-color 0.2s ease;
+    }
+
+    .back-button:hover {
+      background-color: var(--color-accent-hover);
+    }
+  }
+</style>

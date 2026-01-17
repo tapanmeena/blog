@@ -1,22 +1,69 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
-import { collectUniqueTags, tagToUrl } from "@utils/tags";
+import { collectUniqueTags, normalizeTag } from "@utils/tags";
+import TagCloud from "@components/blog/TagCloud.astro";
 
 const allPosts = await getCollection("blog");
-const uniqueTags = collectUniqueTags(allPosts);
+const publishedPosts = allPosts.filter((post) => !post.data.draft);
+const uniqueTags = collectUniqueTags(publishedPosts);
 
-const pageTitle = "Tag Index";
+// Get post count for each tag
+const tagsWithCount = uniqueTags
+  .map((tag) => {
+    const count = publishedPosts.filter((post) => post.data.tags.some((t) => normalizeTag(t) === normalizeTag(tag))).length;
+    return { name: tag, count };
+  })
+  .sort((a, b) => b.count - a.count);
+
+const pageTitle = "Tags";
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <ul>
+  <div class="tags-page">
+    <header class="page-header">
+      <h1>Tags</h1>
+      <p class="page-subtitle">Explore posts by topic — larger tags have more posts</p>
+    </header>
+
     {
-      uniqueTags.map((tag) => (
-          <li>
-            <a href={tagToUrl(tag)}>{tag}</a>
-          </li>
-        ))
+      tagsWithCount.length > 0 ? (
+        <TagCloud tags={tagsWithCount} />
+      ) : (
+        <div class="empty-state">
+          <p>No tags found.</p>
+        </div>
+      )
     }
-  </ul>
+  </div>
 </BaseLayout>
+
+<style>
+  @reference "tailwindcss";
+
+  @layer components {
+    .tags-page {
+      @apply mx-auto max-w-4xl px-4 py-12;
+    }
+
+    .page-header {
+      @apply mb-10 text-center;
+    }
+
+    .page-header h1 {
+      @apply mb-3 text-4xl font-bold;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+    }
+
+    .page-subtitle {
+      @apply text-lg;
+      color: var(--color-muted);
+    }
+
+    .empty-state {
+      @apply py-16 text-center;
+      color: var(--color-muted);
+    }
+  }
+</style>

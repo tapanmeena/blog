@@ -1,0 +1,177 @@
+---
+import type { CollectionEntry } from "astro:content";
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+import { Calendar, Clock, Folder, Tag } from "@lucide/astro";
+import { calculateReadTime, formatReadTime } from "@utils/readTime";
+import { categoryToUrl } from "@utils/category";
+import { tagToUrl } from "@utils/tags";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { title, description, publishedAt, category, tags, coverImage } = post.data;
+
+const readTime = calculateReadTime(post.body);
+const imageSrc = coverImage as ImageMetadata | undefined;
+
+const formattedDate = publishedAt.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+---
+
+<article class="blog-card">
+  <a href={`/blog/${post.slug}`} class="card-link">
+    {
+      imageSrc && (
+        <div class="card-image">
+          <Image src={imageSrc} alt={`Cover image for ${title}`} class="cover-img" width={400} height={225} />
+        </div>
+      )
+    }
+    <div class="card-content">
+      <div class="card-meta">
+        <span class="meta-item">
+          <Calendar size={14} />
+          <time datetime={publishedAt.toISOString()}>{formattedDate}</time>
+        </span>
+        <span class="meta-item">
+          <Clock size={14} />
+          <span>{formatReadTime(readTime)}</span>
+        </span>
+      </div>
+
+      <h3 class="card-title">{title}</h3>
+
+      {description && <p class="card-description">{description}</p>}
+
+      <div class="card-taxonomy">
+        <a href={categoryToUrl(category)} class="category-badge" onclick="event.stopPropagation()">
+          <Folder size={12} />
+          {category}
+        </a>
+        {
+          tags.length > 0 && (
+            <div class="tags-list">
+              {tags.slice(0, 3).map((tag) => (
+                <a href={tagToUrl(tag)} class="tag-pill" onclick="event.stopPropagation()">
+                  {tag}
+                </a>
+              ))}
+              {tags.length > 3 && <span class="tag-more">+{tags.length - 3}</span>}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </a>
+</article>
+
+<style>
+  @reference "tailwindcss";
+
+  @layer components {
+    .blog-card {
+      @apply overflow-hidden rounded-xl;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+      border-color: var(--color-accent);
+    }
+
+    .card-link {
+      @apply block no-underline;
+      color: inherit;
+    }
+
+    .card-image {
+      @apply aspect-video w-full overflow-hidden;
+    }
+
+    .cover-img {
+      @apply h-full w-full object-cover;
+      transition: transform 0.3s ease;
+    }
+
+    .blog-card:hover .cover-img {
+      transform: scale(1.05);
+    }
+
+    .card-content {
+      @apply space-y-3 p-5;
+    }
+
+    .card-meta {
+      @apply flex flex-wrap items-center gap-3 text-xs;
+      color: var(--color-muted);
+    }
+
+    .meta-item {
+      @apply flex items-center gap-1;
+    }
+
+    .card-title {
+      @apply line-clamp-2 text-lg font-semibold leading-tight;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .card-description {
+      @apply line-clamp-2 text-sm;
+      color: var(--color-muted);
+      margin: 0;
+    }
+
+    .card-taxonomy {
+      @apply flex flex-wrap items-center gap-2 pt-2;
+    }
+
+    .category-badge {
+      @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium no-underline;
+      background-color: var(--color-accent);
+      color: white;
+      transition: background-color 0.2s ease;
+    }
+
+    .category-badge:hover {
+      background-color: var(--color-accent-hover);
+    }
+
+    .tags-list {
+      @apply flex flex-wrap items-center gap-1.5;
+    }
+
+    .tag-pill {
+      @apply inline-block rounded-full px-2 py-0.5 text-xs no-underline;
+      background-color: var(--color-bg);
+      color: var(--color-muted);
+      border: 1px solid var(--color-border);
+      transition:
+        color 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .tag-pill:hover {
+      color: var(--color-accent);
+      border-color: var(--color-accent);
+    }
+
+    .tag-more {
+      @apply text-xs;
+      color: var(--color-muted);
+    }
+  }
+</style>

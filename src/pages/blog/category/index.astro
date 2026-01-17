@@ -1,22 +1,126 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
-import { collectUniqueCategory, categoryToUrl } from "@utils/category";
+import { collectUniqueCategory, categoryToUrl, normalizeCategory } from "@utils/category";
+import { Folder } from "@lucide/astro";
 
 const allPosts = await getCollection("blog");
-const uniqueCategories = collectUniqueCategory(allPosts);
+const publishedPosts = allPosts.filter((post) => !post.data.draft);
+const uniqueCategories = collectUniqueCategory(publishedPosts);
 
-const pageTitle = "Category Index";
+// Get post count for each category
+const categoriesWithCount = uniqueCategories
+  .map((category) => {
+    const count = publishedPosts.filter((post) => normalizeCategory(post.data.category) === normalizeCategory(category)).length;
+    return { name: category, count };
+  })
+  .sort((a, b) => b.count - a.count);
+
+const pageTitle = "Categories";
 ---
 
 <BaseLayout pageTitle={pageTitle}>
-  <ul>
+  <div class="categories-page">
+    <header class="page-header">
+      <h1>Categories</h1>
+      <p class="page-subtitle">Browse posts by category</p>
+    </header>
+
     {
-      uniqueCategories.map((category) => (
-        <li>
-          <a href={categoryToUrl(category)}>{category}</a>
-        </li>
-      ))
+      categoriesWithCount.length > 0 ? (
+        <div class="categories-grid">
+          {categoriesWithCount.map(({ name, count }) => (
+            <a href={categoryToUrl(name)} class="category-card">
+              <div class="category-icon">
+                <Folder size={24} />
+              </div>
+              <div class="category-info">
+                <h2 class="category-name">{name}</h2>
+                <span class="category-count">
+                  {count} {count === 1 ? "post" : "posts"}
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state">
+          <p>No categories found.</p>
+        </div>
+      )
     }
-  </ul>
+  </div>
 </BaseLayout>
+
+<style>
+  @reference "tailwindcss";
+
+  @layer components {
+    .categories-page {
+      @apply mx-auto max-w-4xl px-4 py-12;
+    }
+
+    .page-header {
+      @apply mb-10 text-center;
+    }
+
+    .page-header h1 {
+      @apply mb-3 text-4xl font-bold;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+    }
+
+    .page-subtitle {
+      @apply text-lg;
+      color: var(--color-muted);
+    }
+
+    .categories-grid {
+      @apply grid gap-4;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    .category-card {
+      @apply flex items-center gap-4 rounded-xl p-5 no-underline;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .category-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
+      border-color: var(--color-accent);
+    }
+
+    .category-icon {
+      @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-lg;
+      background-color: var(--color-accent);
+      color: white;
+    }
+
+    .category-info {
+      @apply flex flex-col;
+    }
+
+    .category-name {
+      @apply text-lg font-semibold;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .category-count {
+      @apply text-sm;
+      color: var(--color-muted);
+    }
+
+    .empty-state {
+      @apply py-16 text-center;
+      color: var(--color-muted);
+    }
+  }
+</style>

@@ -4,11 +4,6 @@ description: "Discover AzPim CLI, a powerful command-line tool for managing Azur
 publishedAt: 2026-01-17
 category: cli-tools
 tags:
-  - Azure
-  - API Management
-  - CLI Tools
-  - DevOps
-  - Cloud Computing
   - astro
 author: "Tapan Meena"
 draft: false

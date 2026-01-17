@@ -1,22 +1,64 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import BlogCard from "@components/blog/BlogCard.astro";
+import InfiniteScroll from "@components/ui/InfiniteScroll.astro";
 
-let allPosts = await getCollection("blog");
-for (let i = 0; i < 10; i++) {
-  allPosts = allPosts.concat(allPosts);
-}
+const allPosts = await getCollection("blog");
+
+// Filter drafts and sort by publishedAt descending
+const posts = allPosts.filter((post) => !post.data.draft).sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 ---
 
-<BaseLayout pageTitle="Home Page">
-  <p>Welcome to the home page!</p>
-  {
-    allPosts
-      .filter((post) => !post.data.draft)
-      .map((post) => (
-        <li>
-          <a href={`/blog/${post.slug}`}>{post.data.title}</a>
-        </li>
-      ))
-  }
+<BaseLayout pageTitle="Blog">
+  <div class="blog-index">
+    <header class="blog-header">
+      <h1>Blog</h1>
+      <p class="blog-subtitle">Thoughts, tutorials, and insights on development and technology.</p>
+    </header>
+
+    {
+      posts.length > 0 ? (
+        <InfiniteScroll initialCount={6} loadCount={6}>
+          {posts.map((post) => (
+            <BlogCard post={post} />
+          ))}
+        </InfiniteScroll>
+      ) : (
+        <div class="empty-state">
+          <p>No posts published yet. Check back soon!</p>
+        </div>
+      )
+    }
+  </div>
 </BaseLayout>
+
+<style>
+  @reference "tailwindcss";
+
+  @layer components {
+    .blog-index {
+      @apply mx-auto max-w-6xl px-4 py-12;
+    }
+
+    .blog-header {
+      @apply mb-10 text-center;
+    }
+
+    .blog-header h1 {
+      @apply mb-3 text-4xl font-bold;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+    }
+
+    .blog-subtitle {
+      @apply text-lg;
+      color: var(--color-muted);
+    }
+
+    .empty-state {
+      @apply py-16 text-center;
+      color: var(--color-muted);
+    }
+  }
+</style>
