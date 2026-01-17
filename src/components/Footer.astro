@@ -1,60 +1,251 @@
-<footer class="footer">
-  <div class="footer-inner">
-    <p class="footer-brand">
-      © {new Date().getFullYear()} Tapan Meena
-    </p>
+---
+import { Github, Twitter, Linkedin, Rss, ArrowUp, Mail } from "@lucide/astro";
 
-    <nav class="footer-nav">
-      <a href="/blog">Blog</a>
-      <a href="/projects">Projects</a>
-      <a href="/about">About</a>
-      <a href="/rss.xml">RSS</a>
-    </nav>
+const currentYear = new Date().getFullYear();
+
+const quickLinks = [
+  { href: "/blog", label: "Blog" },
+  { href: "/projects", label: "Projects" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
+
+const socialLinks = [
+  { href: "https://github.com/tapanmeena", label: "GitHub", icon: Github },
+  { href: "https://twitter.com/tapanmeena3", label: "Twitter", icon: Twitter },
+  {
+    href: "https://linkedin.com/in/tapanmeena",
+    label: "LinkedIn",
+    icon: Linkedin,
+  },
+  { href: "/rss.xml", label: "RSS Feed", icon: Rss },
+];
+---
+
+<footer class="footer">
+  <div class="footer-container">
+    <!-- Main Footer Content -->
+    <div class="footer-grid">
+      <!-- Brand Column -->
+      <div class="footer-brand">
+        <a href="/" class="footer-logo">
+          <span class="footer-monogram">TM</span>
+          <span class="footer-name">Tapan Meena</span>
+        </a>
+        <p class="footer-tagline">Software engineer sharing thoughts on web development, cloud, and developer tools.</p>
+      </div>
+
+      <!-- Quick Links Column -->
+      <div class="footer-section">
+        <h3 class="footer-heading">Quick Links</h3>
+        <nav class="footer-links">
+          {
+            quickLinks.map((link) => (
+              <a href={link.href} class="footer-link">
+                {link.label}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+
+      <!-- Newsletter Column -->
+      <div class="footer-section">
+        <h3 class="footer-heading">Newsletter</h3>
+        <p class="footer-newsletter-text">Get notified about new posts and projects.</p>
+        <form class="newsletter-form" action="#" method="POST">
+          <div class="newsletter-input-wrapper">
+            <Mail class="newsletter-icon" size={16} />
+            <input type="email" name="email" placeholder="your@email.com" required class="newsletter-input" />
+          </div>
+          <button type="submit" class="newsletter-btn">Subscribe</button>
+        </form>
+      </div>
+
+      <!-- Social Column -->
+      <div class="footer-section">
+        <h3 class="footer-heading">Connect</h3>
+        <div class="footer-social">
+          {
+            socialLinks.map((link) => (
+              <a
+                href={link.href}
+                class="social-link"
+                aria-label={link.label}
+                target={link.href.startsWith("http") ? "_blank" : undefined}
+                rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
+              >
+                <link.icon size={20} />
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="footer-bottom">
+      <p class="footer-copyright">
+        © {currentYear} Tapan Meena. All rights reserved.
+      </p>
+      <button id="back-to-top" class="back-to-top" aria-label="Back to top">
+        <ArrowUp size={18} />
+        <span>Back to top</span>
+      </button>
+    </div>
   </div>
 </footer>
 
+<script is:inline>
+  document.getElementById("back-to-top").addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+</script>
+
 <style>
-  /* ================= FOOTER ================= */
-  .footer {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 32px 0;
-  }
+  @reference "tailwindcss";
 
-  .footer-inner {
-    margin: 0 auto;
-    padding: 0 24px;
+  @layer components {
+    .footer {
+      @apply mt-auto
+        border-t border-(--color-border)
+        bg-(--color-surface);
+    }
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-  }
+    .footer-container {
+      @apply mx-auto max-w-6xl px-6 py-12;
+    }
 
-  .footer-brand {
-    font-size: 14px;
-    opacity: 0.6;
-  }
+    .footer-grid {
+      @apply grid gap-8
+        grid-cols-1
+        sm:grid-cols-2
+        lg:grid-cols-4;
+    }
 
-  .footer-nav {
-    display: flex;
-    gap: 20px;
-  }
+    /* Brand */
+    .footer-brand {
+      @apply sm:col-span-2 lg:col-span-1;
+    }
 
-  .footer-nav a {
-    font-size: 14px;
-    text-decoration: none;
-    opacity: 0.7;
-  }
+    .footer-logo {
+      @apply flex items-center gap-2 no-underline mb-3;
+    }
 
-  .footer-nav a:hover {
-    opacity: 1;
-  }
+    .footer-monogram {
+      @apply flex h-8 w-8 items-center justify-center
+        rounded-lg
+        bg-linear-to-br from-blue-500 to-purple-600
+        text-xs font-bold text-white;
+    }
 
-  /* Mobile */
-  @media (max-width: 640px) {
-    .footer-inner {
-      flex-direction: column;
-      text-align: center;
+    .footer-name {
+      @apply text-lg font-bold text-(--color-text);
+    }
+
+    .footer-tagline {
+      @apply text-sm text-(--color-muted) leading-relaxed;
+    }
+
+    /* Sections */
+    .footer-section {
+      @apply flex flex-col;
+    }
+
+    .footer-heading {
+      @apply text-sm font-semibold uppercase tracking-wider
+        text-(--color-text)
+        mb-4;
+    }
+
+    .footer-links {
+      @apply flex flex-col gap-2;
+    }
+
+    .footer-link {
+      @apply text-sm text-(--color-muted)
+        no-underline
+        transition-colors
+        hover:text-(--color-text);
+    }
+
+    /* Newsletter */
+    .footer-newsletter-text {
+      @apply text-sm text-(--color-muted) mb-3;
+    }
+
+    .newsletter-form {
+      @apply flex flex-col gap-2;
+    }
+
+    .newsletter-input-wrapper {
+      @apply relative;
+    }
+
+    .newsletter-icon {
+      @apply absolute left-3 top-1/2 -translate-y-1/2
+        text-(--color-muted);
+    }
+
+    .newsletter-input {
+      @apply w-full pl-9 pr-3 py-2
+        text-sm
+        bg-(--color-bg)
+        border border-(--color-border)
+        rounded-lg
+        text-(--color-text)
+        placeholder:text-(--color-muted)
+        focus:outline-none focus:ring-2 focus:ring-(--color-accent)
+        transition;
+    }
+
+    .newsletter-btn {
+      @apply px-4 py-2
+        text-sm font-medium text-white
+        bg-(--color-accent)
+        rounded-lg
+        transition
+        hover:bg-(--color-accent-hover);
+    }
+
+    /* Social */
+    .footer-social {
+      @apply flex gap-3;
+    }
+
+    .social-link {
+      @apply flex h-10 w-10 items-center justify-center
+        rounded-full
+        border border-(--color-border)
+        text-(--color-muted)
+        transition
+        hover:text-(--color-text)
+        hover:border-(--color-muted)
+        hover:scale-105;
+    }
+
+    /* Bottom */
+    .footer-bottom {
+      @apply flex flex-col sm:flex-row items-center justify-between
+        gap-4
+        mt-10 pt-6
+        border-t border-(--color-border);
+    }
+
+    .footer-copyright {
+      @apply text-sm text-(--color-muted);
+    }
+
+    .back-to-top {
+      @apply flex items-center gap-2
+        px-4 py-2
+        text-sm font-medium
+        text-(--color-muted)
+        border border-(--color-border)
+        rounded-full
+        transition
+        hover:text-(--color-text)
+        hover:border-(--color-muted);
     }
   }
 </style>

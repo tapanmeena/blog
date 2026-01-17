@@ -1,0 +1,149 @@
+---
+import { LoaderCircle } from "@lucide/astro";
+import clsx from "clsx";
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"button"> {
+  variant?: "primary" | "secondary" | "outline" | "ghost";
+  size?: "sm" | "md" | "lg";
+  href?: string;
+  isLoading?: boolean;
+  loadingText?: string;
+  class?: string;
+}
+
+const {
+  variant = "primary",
+  size = "md",
+  href,
+  type = "button",
+  disabled = false,
+  isLoading = false,
+  loadingText,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const isDisabled = disabled || isLoading;
+
+const classes = clsx(
+  "btn",
+  `btn-${variant}`,
+  `btn-${size}`,
+  {
+    "btn-disabled": isDisabled,
+    "btn-loading": isLoading,
+  },
+  className,
+);
+
+const iconSize = size === "sm" ? 14 : size === "lg" ? 20 : 16;
+---
+
+{
+  href && !isDisabled ? (
+    <a href={href} class={classes} {...rest}>
+      <span class="btn-content">
+        <slot name="icon-left" />
+        <slot />
+        <slot name="icon-right" />
+      </span>
+    </a>
+  ) : (
+    <button type={type} class={classes} disabled={isDisabled} {...rest}>
+      <span class="btn-content">
+        {isLoading ? (
+          <>
+            <LoaderCircle class="animate-spin" size={iconSize} />
+            {loadingText !== undefined ? <span>{loadingText}</span> : <slot />}
+          </>
+        ) : (
+          <>
+            <slot name="icon-left" />
+            <slot />
+            <slot name="icon-right" />
+          </>
+        )}
+      </span>
+    </button>
+  )
+}
+
+<style>
+  @reference "tailwindcss";
+
+  @layer components {
+    /* Base button styles */
+    .btn {
+      @apply inline-flex items-center justify-center
+      font-medium
+      rounded-lg
+      border
+      transition-all duration-200
+      focus:outline-none focus:ring-2 focus:ring-offset-2
+      focus:ring-(--color-accent)
+      no-underline
+      cursor-pointer;
+    }
+
+    .btn-content {
+      @apply inline-flex items-center justify-center gap-2;
+    }
+
+    /* Variants */
+    .btn-primary {
+      @apply bg-(--color-accent)
+      border-transparent
+      text-white
+      hover:bg-(--color-accent-hover)
+      active:scale-[0.98];
+    }
+
+    .btn-secondary {
+      @apply bg-(--color-surface)
+      border-(--color-border)
+      text-(--color-text)
+      hover:bg-(--color-border)
+      active:scale-[0.98];
+    }
+
+    .btn-outline {
+      @apply bg-transparent
+      border-(--color-border)
+      text-(--color-text)
+      hover:bg-(--color-surface)
+      hover:border-(--color-muted)
+      active:scale-[0.98];
+    }
+
+    .btn-ghost {
+      @apply bg-transparent
+      border-transparent
+      text-(--color-text)
+      hover:bg-gray-100 dark:hover:bg-white/10
+      active:scale-[0.98];
+    }
+
+    /* Sizes */
+    .btn-sm {
+      @apply px-3 py-1.5 text-sm;
+    }
+
+    .btn-md {
+      @apply px-4 py-2 text-sm;
+    }
+
+    .btn-lg {
+      @apply px-6 py-3 text-base;
+    }
+
+    /* States */
+    .btn-disabled {
+      @apply opacity-50 cursor-not-allowed pointer-events-none;
+    }
+
+    .btn-loading {
+      @apply cursor-wait;
+    }
+  }
+</style>
