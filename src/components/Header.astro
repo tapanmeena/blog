@@ -1,0 +1,95 @@
+---
+import { Moon, Sun } from "@lucide/astro";
+---
+
+<header id="site-header" class="site-header fixed z-50 transition-all duration-500">
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+    <div>
+      <a href="/" class="text-lg font-bold text-gray-900 dark:text-gray-100 no-underline"> Tapan Meena </a>
+    </div>
+
+    <nav class="flex gap-6 text-sm font-medium text-gray-700 dark:text-gray-300">
+      <a href="/blog" class="hover:text-gray-900 dark:hover:text-white transition-colors">Blog</a>
+      <a href="/projects" class="hover:text-gray-900 dark:hover:text-white transition-colors">Projects</a>
+      <a href="/about" class="hover:text-gray-900 dark:hover:text-white transition-colors">About</a>
+      <a href="/contact" class="hover:text-gray-900 dark:hover:text-white transition-colors">Contact</a>
+    </nav>
+
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" aria-label="Toggle theme" class="theme-toggle">
+      <Sun class="sun-icon" size={18} />
+      <Moon class="moon-icon" size={18} />
+    </button>
+  </div>
+</header>
+
+<script is:inline>
+  const header = document.getElementById("site-header");
+
+  const getScrollThreshold = () => (window.innerWidth < 600 ? 32 : 64);
+
+  const onScroll = () => {
+    header.classList.toggle("is-scrolled", window.scrollY > getScrollThreshold());
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll, { passive: true });
+</script>
+
+<style>
+  @reference "tailwindcss";
+
+  @layer components {
+    /* Header base */
+    .site-header {
+      @apply top-0 left-0 w-full bg-transparent;
+    }
+
+    /* Glass header on scroll */
+    .site-header.is-scrolled {
+      @apply top-4
+        left-4
+        w-[calc(100%-32px)]
+        rounded-[18px]
+        shadow-sm
+        backdrop-blur
+        backdrop-saturate-150
+        transition-all;
+
+      @apply bg-white/70 dark:bg-black/45;
+    }
+
+    /* Theme toggle button */
+    .theme-toggle {
+      @apply relative flex h-9 w-9 items-center justify-center
+        rounded-full
+        border
+        border-gray-200 dark:border-white/10
+        bg-white/70 dark:bg-black/40
+        backdrop-blur
+        transition
+        hover:scale-105;
+    }
+
+    .theme-toggle svg {
+      @apply absolute transition-all duration-300;
+    }
+
+    /* Icon visibility */
+    .dark .sun-icon {
+      @apply opacity-0 rotate-90 scale-75;
+    }
+
+    .dark .moon-icon {
+      @apply opacity-100 rotate-0 scale-100;
+    }
+
+    .sun-icon {
+      @apply opacity-100 rotate-0 scale-100 text-amber-500;
+    }
+
+    .moon-icon {
+      @apply opacity-0 -rotate-90 scale-75 text-indigo-300;
+    }
+  }
+</style>

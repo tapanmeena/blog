@@ -1,0 +1,22 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+let allPosts = await getCollection("blog");
+for (let i = 0; i < 10; i++) {
+  allPosts = allPosts.concat(allPosts);
+}
+---
+
+<BaseLayout pageTitle="Home Page">
+  <p>Welcome to the home page!</p>
+  {
+    allPosts
+      .filter((post) => !post.data.draft)
+      .map((post) => (
+        <li>
+          <a href={`/blog/${post.slug}`}>{post.data.title}</a>
+        </li>
+      ))
+  }
+</BaseLayout>

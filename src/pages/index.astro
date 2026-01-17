@@ -1,19 +1,12 @@
 ---
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
-
-const allPosts = await getCollection("blog");
 ---
 
 <BaseLayout pageTitle="Home Page">
-  <p>Welcome to the home page!</p>
-  {
-    allPosts
-      .filter((post) => !post.data.draft)
-      .map((post) => (
-        <li>
-          <a href={`/blog/${post.slug}`}>{post.data.title}</a>
-        </li>
-      ))
-  }
+  <p class="font-bold text-9xl">Welcome to the home page!</p>
+  <p class="font-bold text-9xl">Welcome to the home page!</p>
+  <p class="font-bold text-9xl">Welcome to the home page!</p>
+  <p class="font-bold text-9xl">Welcome to the home page!</p>
+  <p class="font-bold text-9xl">Welcome to the home page!</p>
+  <p class="font-bold text-9xl">Welcome to the home page!</p>
 </BaseLayout>
