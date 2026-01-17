@@ -11,5 +11,9 @@ export default defineConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    server: {
+      host: true,
+      allowedHosts: ["blog.tapanmeena.com"],
+    },
   },
 });
