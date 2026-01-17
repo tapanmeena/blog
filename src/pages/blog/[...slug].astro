@@ -1,4 +1,5 @@
 ---
+import BaseLayout from "@layouts/BaseLayout.astro";
 import type { CollectionEntry } from "astro:content";
 import { getCollection } from "astro:content";
 
@@ -18,20 +19,55 @@ type Props = {
 
 const { post } = Astro.props;
 const { Content } = await post.render();
+
+const formattedDate = post.data.publishedAt.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{post.data.title}</title>
-  </head>
-  <body>
-    <article>
-      <h1>{post.data.title}</h1>
-      <p>{post.data.description}</p>
+<BaseLayout pageTitle={post.data.title}>
+  <article class="article-container">
+    <header class="article-header">
+      <h1 class="article-title">{post.data.title}</h1>
+      <p class="article-meta">
+        <time datetime={post.data.publishedAt.toISOString()}>{formattedDate}</time>
+      </p>
+      {post.data.description && <p class="article-description">{post.data.description}</p>}
+    </header>
+    <div class="prose">
       <Content />
-    </article>
-  </body>
-</html>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  @reference "tailwindcss";
+
+  @layer components {
+    .article-container {
+      @apply mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8;
+    }
+
+    .article-header {
+      @apply mb-8 border-b border-(--color-border) pb-8;
+    }
+
+    .article-title {
+      @apply text-3xl font-bold tracking-tight sm:text-4xl;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+    }
+
+    .article-meta {
+      @apply mt-3 text-sm;
+      color: var(--color-muted);
+    }
+
+    .article-description {
+      @apply mt-4 text-lg;
+      color: var(--color-muted);
+    }
+  }
+</style>
