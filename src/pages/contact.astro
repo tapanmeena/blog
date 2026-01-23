@@ -1,0 +1,305 @@
+---
+import Button from "@components/ui/Button.astro";
+import { authors } from "@data/authors";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { Github, Globe, Linkedin, Mail, MapIcon, MessageCircle, Phone, Twitter, X } from "@lucide/astro";
+
+const author = authors["tapan-meena"];
+---
+
+<BaseLayout pageTitle="Contact">
+  <div class="contact-page">
+    <!-- Header Section -->
+    <header class="page-header">
+      <h1 class="page-title">Get in Touch</h1>
+      <p class="page-description">
+        Interested in collaboration, have a question, or just want to say hello? I'd love to hear from you. Feel free to reach out through any of the
+        channels below.
+      </p>
+    </header>
+
+    <!-- Contact Cards Section -->
+    <section class="contact-section">
+      <h2 class="section-title">
+        <MessageCircle size={24} />
+        Direct Contact
+      </h2>
+      <div class="contact-cards">
+        {
+          author.email && (
+            <a href={`mailto:${author.email}`} class="contact-card">
+              <div class="contact-card-icon">
+                <Mail size={28} />
+              </div>
+              <div class="contact-card-content">
+                <h3 class="contact-card-title">Email</h3>
+                <p class="contact-card-value">{author.email}</p>
+                <span class="contact-card-action">Send an email →</span>
+              </div>
+            </a>
+          )
+        }
+        {
+          author.phone && (
+            <a href={`tel:${author.phone}`} class="contact-card">
+              <div class="contact-card-icon">
+                <Phone size={28} />
+              </div>
+              <div class="contact-card-content">
+                <h3 class="contact-card-title">Phone</h3>
+                <p class="contact-card-value">{author.phone}</p>
+                <span class="contact-card-action">Give me a call →</span>
+              </div>
+            </a>
+          )
+        }
+        {
+          author.location && (
+            <div class="contact-card contact-card-static">
+              <div class="contact-card-icon">
+                <MapIcon size={28} />
+              </div>
+              <div class="contact-card-content">
+                <h3 class="contact-card-title">Location</h3>
+                <p class="contact-card-value">{author.location}</p>
+                <span class="contact-card-action">Available for remote work</span>
+              </div>
+            </div>
+          )
+        }
+      </div>
+    </section>
+
+    <!-- Social Links Section -->
+    <section class="contact-section">
+      <h2 class="section-title">
+        <Globe size={24} />
+        Connect Online
+      </h2>
+      <p class="section-description">Follow me on social media or check out my work on these platforms.</p>
+      <div class="social-grid">
+        {
+          author.social?.github && (
+            <a href={author.social.github} class="social-card" target="_blank" rel="noopener noreferrer">
+              <Github size={32} />
+              <div class="social-card-info">
+                <span class="social-card-name">GitHub</span>
+                <span class="social-card-handle">@tapanmeena</span>
+              </div>
+            </a>
+          )
+        }
+        {
+          author.social?.linkedin && (
+            <a href={author.social.linkedin} class="social-card" target="_blank" rel="noopener noreferrer">
+              <Linkedin size={32} />
+              <div class="social-card-info">
+                <span class="social-card-name">LinkedIn</span>
+                <span class="social-card-handle">Tapan Meena</span>
+              </div>
+            </a>
+          )
+        }
+        {
+          author.social?.twitter && (
+            <a href={author.social.twitter} class="social-card" target="_blank" rel="noopener noreferrer">
+              <Twitter size={32} />
+              <div class="social-card-info">
+                <span class="social-card-name">Twitter</span>
+                <span class="social-card-handle">@tapanmeena3</span>
+              </div>
+            </a>
+          )
+        }
+        {
+          author.social?.website && (
+            <a href={author.social.website} class="social-card" target="_blank" rel="noopener noreferrer">
+              <Globe size={32} />
+              <div class="social-card-info">
+                <span class="social-card-name">Website</span>
+                <span class="social-card-handle">tapanmeena.com</span>
+              </div>
+            </a>
+          )
+        }
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+      <div class="cta-content">
+        <h2 class="cta-title">Let's Build Something Together</h2>
+        <p class="cta-description">
+          Wheather you have a project in mind, need technical consultation, or want to explore collaboration opportunities, I'm here to help.
+        </p>
+        <div class="cta-buttons">
+          <Button href={`mailto:${author.email}`} variant="primary" size="lg">
+            <Mail slot="icon-left" size={18} />
+            Send an Email
+          </Button>
+          <Button href="/projects" variant="outline" size="lg"> View My Work</Button>
+        </div>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  @reference "tailwindcss";
+
+  @layer components {
+    .contact-page {
+      @apply mx-auto max-w-6xl px-4 pb-16;
+    }
+
+    /* Header */
+    .page-header {
+      @apply py-12 text-center border-b;
+      border-color: var(--color-border);
+    }
+
+    .page-title {
+      @apply text-4xl font-bold mb-4;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+    }
+
+    .page-description {
+      @apply text-lg max-w-2xl mx-auto;
+      color: var(--color-muted);
+    }
+
+    /* Sections */
+    .contact-section {
+      @apply py-10 border-b;
+      border-color: var(--color-border);
+    }
+
+    .section-title {
+      @apply flex items-center gap-3 text-xl font-bold mb-4;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+    }
+
+    .section-description {
+      @apply text-base mb-6;
+      color: var(--color-muted);
+    }
+
+    /* Contact Cards */
+    .contact-cards {
+      @apply grid gap-4 md:grid-cols-3;
+    }
+
+    .contact-card {
+      @apply flex items-start gap-4 p-5 rounded-xl no-underline transition-all duration-200;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+    }
+
+    .contact-card:not(.contact-card-static):hover {
+      border-color: var(--color-accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.1);
+    }
+
+    :global(.dark) .contact-card:not(.contact-card-static):hover {
+      box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.3);
+    }
+
+    .contact-card-static {
+      @apply cursor-default;
+    }
+
+    .contact-card-icon {
+      @apply shrink-0 p-3 rounded-lg;
+      background-color: var(--color-bg-accent);
+      color: var(--color-accent);
+    }
+
+    .contact-card-content {
+      @apply flex flex-col gap-1;
+    }
+
+    .contact-card-title {
+      @apply text-sm font-semibold uppercase tracking-wider;
+      color: var(--color-muted);
+    }
+
+    .contact-card-value {
+      @apply text-base font-medium;
+      color: var(--color-text);
+    }
+
+    .contact-card-action {
+      @apply text-sm mt-1;
+      color: var(--color-accent);
+    }
+
+    .contact-card-note {
+      @apply text-xs mt-1 italic;
+      color: var(--color-muted);
+    }
+
+    /* Social Grid */
+    .social-grid {
+      @apply grid gap-4 sm:grid-cols-2 lg:grid-cols-4;
+    }
+
+    .social-card {
+      @apply flex items-center gap-4 p-5 rounded-xl no-underline transition-all duration-200;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      color: var(--color-text);
+    }
+
+    .social-card:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      transform: translateY(-2px);
+    }
+
+    .social-card-info {
+      @apply flex flex-col;
+    }
+
+    .social-card-name {
+      @apply text-sm font-semibold;
+    }
+
+    .social-card-handle {
+      @apply text-xs;
+      color: var(--color-muted);
+    }
+
+    .social-card:hover .social-card-handle {
+      color: var(--color-accent);
+    }
+
+    /* CTA Section */
+    .cta-section {
+      @apply py-12;
+    }
+
+    .cta-content {
+      @apply text-center p-8 rounded-2xl;
+      background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-bg-accent) 100%);
+      border: 1px solid var(--color-border);
+    }
+
+    .cta-title {
+      @apply text-2xl font-bold mb-3;
+      font-family: var(--font-sans);
+      color: var(--color-text);
+    }
+
+    .cta-description {
+      @apply text-base max-w-xl mx-auto mb-6;
+      color: var(--color-muted);
+    }
+
+    .cta-buttons {
+      @apply flex flex-wrap justify-center gap-4;
+    }
+  }
+</style>

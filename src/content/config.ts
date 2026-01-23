@@ -1,5 +1,7 @@
 import { defineCollection, z } from "astro:content";
 
+const urlOptional = z.string().url().optional();
+
 export const blogCollection = defineCollection({
   type: "content",
   schema: ({ image }) =>
@@ -16,6 +18,29 @@ export const blogCollection = defineCollection({
     }),
 });
 
+export const projectsCollection = defineCollection({
+  type: "content",
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      description: z.string(),
+      coverImage: image().optional(),
+      techStack: z.array(z.string()).default([]),
+      category: z.string().optional(),
+      liveUrl: urlOptional,
+      repoUrl: urlOptional,
+      blogUrl: urlOptional,
+      startDate: z.date(),
+      endDate: z.date().optional(),
+      status: z
+        .enum(["in-progress", "completed", "archived"])
+        .default("in-progress"),
+      featured: z.boolean().default(false),
+      draft: z.boolean().default(false),
+    }),
+});
+
 export const collections = {
   blog: blogCollection,
+  projects: projectsCollection,
 };
